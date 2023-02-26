@@ -30,4 +30,26 @@ const fetchMyIP = function(callback) {
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  request(`http://ipwho.is/${ip}`, (error, response, body) => {
+    if (error) {
+      callback(error, null);
+      return;
+    }
+
+    const bodyObject = JSON.parse(body);
+    if (!bodyObject.success) {
+      const message = `Success status was ${bodyObject.success}. Server message says: ${bodyObject.message} when fetching for IP ${bodyObject.ip}`;
+      callback(Error(message), null);
+      return;
+    }
+
+
+    let data = {};
+    data.latitude = bodyObject.latitude;
+    data.longitude = bodyObject.longitude;
+    callback(null, data);
+  });
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP };
